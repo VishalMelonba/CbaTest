@@ -53,9 +53,9 @@ It contains detailed information about the test run.
 5. Look for the "Run workflow" button on the right side of the page.
 
 
-## Auto trigger tests CI:
+## Auto trigger tests in CI:
 
-- Any push event to a branch that starts with feature/
+- Any push event to a branch that starts with feature/ or main branch
 - will initiate the workflow which includes building the project and running tests.
 
 
