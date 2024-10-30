@@ -44,7 +44,8 @@ The project tests the Petstore API endpoints, with scenarios derived from [Swagg
 After test execution, navigate to the TestLogs/ directory to find test.log
 It contains detailed information about the test run.
 
-## Manually trigger tests CI:
+## Manually trigger tests in CI: 
+## This will only happen after merging feature branch into main branch
 
 1. Go to the GitHub repository.
 2. Click on the "Actions" tab at the top.
