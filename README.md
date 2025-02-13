@@ -20,6 +20,7 @@ The project tests the Petstore API endpoints, with scenarios derived from [Swagg
 - **`src/test/resources`**: Stores configuration files and Cucumber feature files.
     - **`features/petstore.feature`**: Cucumber feature file describing test scenarios.
 - **`TestLogs/test.log`**: Log file containing details of test execution. The `TestLogs/` directory is ignored by Git, so logs must be generated locally.
+- **`.github/workflows/ci.yml`**: GitHub Actions workflow file for CI, automating the build and test on each push to the repository
 
 ## Requirements
 
