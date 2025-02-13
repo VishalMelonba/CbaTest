@@ -1,4 +1,4 @@
-package com.model;
+package com.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Pet {
-    private long id;
+    private int id;
     private Category category;
     private String name;
     private String[] photoUrls;

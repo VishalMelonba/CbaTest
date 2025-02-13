@@ -1,11 +1,10 @@
 package com.petstore.stepdefinitions;
 
-import com.petstore.utilities.ConfigUtils;
+import com.dto.Pet;
 import com.petstore.utilities.PetUtils;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.*;
-import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,14 +13,11 @@ import org.testng.asserts.SoftAssert;
 public class PetSteps {
     private static final Logger logger = LoggerFactory.getLogger(PetSteps.class);
 
-    ConfigUtils configUtils = new ConfigUtils();
     PetUtils petUtils = new PetUtils();
     private SoftAssert softAssert;
 
-    private int petId;
-    private String petName;
+    private Pet pet;
     private Response response;
-    private final String apiUrl = configUtils.getApiBaseUrl() + "/pet";
 
     @Before
     public void setUp() {
@@ -30,19 +26,18 @@ public class PetSteps {
 
     @Given("I have a new pet with details")
     public void i_have_a_new_pet_with_details() {
-        petId = petUtils.generateRandomPetId();
-        petName = petUtils.generateRandomPetName();
 
-        logger.info("Creating a new pet with ID: {}", petId);
+        pet = petUtils.createPet();
 
-        String requestBody = petUtils.createPetRequestBody(petId, petName);
-        logger.debug("Request Body for adding new pet: {}", requestBody);
+        logger.info("Creating a new pet with ID: {}", pet.getId());
 
-        response = RestAssured.given().contentType("application/json").body(requestBody).post(apiUrl);
+        // Send the request to add the pet
+        response = petUtils.addPetToStore(pet);
+
+        logger.debug("Request Body for adding new pet: {}", pet);
 
         logger.info("Response received: {}", response.getBody().asString());
 
-        petUtils.validateResponse(response, petId, petName);
     }
 
     @When("I add the pet to the store")
@@ -54,7 +49,7 @@ public class PetSteps {
     @Then("I should see the pet in the store")
     public void i_should_see_the_pet_in_the_store() {
         logger.info("Verifying that the pet is in the store");
-        petUtils.validateResponse(response, petId, petName);
+        petUtils.validateResponse(response, pet);
     }
 
     @Given("I have added a pet to the store")
@@ -65,50 +60,47 @@ public class PetSteps {
 
     @When("I retrieve the pet by ID")
     public void i_retrieve_the_pet_by_id() {
-        logger.info("Retrieving pet by ID: {}", petId);
-        response = RestAssured.get(apiUrl + "/" + petId);
+        logger.info("Retrieving pet by ID: {}", pet.getId());
+        response = petUtils.getPetById(pet.getId());
     }
 
     @Then("I should see the pet details")
     public void i_should_see_the_pet_details() {
-        logger.info("Verifying pet details for ID: {}", petId);
-        petUtils.validateResponse(response, petId, petName);
+        logger.info("Verifying pet details for ID: {}", pet);
+        petUtils.validateResponse(response, pet);
     }
 
     @When("I update the pet's name")
     public void i_update_the_pet_s_name() {
-        petName = "UpdatedPetName : " + petUtils.generateRandomPetName(); // New name for the pet
-        String requestBody = petUtils.createPetRequestBody(petId, petName);
+        pet.setName("UpdatedPetName : " + petUtils.generateRandomPetName());// New name for the pet
 
-        logger.info("Updating pet name to: {}", petName);
-        logger.debug("Request Body for updating pet: {}", requestBody);
+        logger.info("Updating pet name to: {}", pet.getName());
+        logger.debug("Request Body for updating pet: {}", pet);
 
-        response = RestAssured.given().contentType("application/json").body(requestBody).put(apiUrl);
-        petUtils.validateResponse(response, petId, petName);
+        // Update the pet
+        response = petUtils.updatePet(pet);
     }
 
     @Then("I should see the updated name when I retrieve the pet")
     public void i_should_see_the_updated_name_when_i_retrieve_the_pet() {
-        logger.info("Verifying the updated name for pet ID: {}", petId);
-        petUtils.validateResponse(response, petId, petName);
+        logger.info("Verifying the updated name for pet ID: {}", pet.getId());
+        petUtils.validateResponse(response, pet);
     }
 
     @When("I delete the pet by ID")
     public void i_delete_the_pet_by_id() {
-        logger.info("Deleting pet with ID: {}", petId);
-        response = RestAssured.given()
-                .header("api_key", "special-key")
-                .delete(apiUrl + "/" + petId);
+        logger.info("Deleting pet with ID: {}", pet.getId());
+        response = petUtils.deletePet(pet.getId());
 
         softAssert.assertEquals(response.getStatusCode(), 200, "Expected status code 200");
         softAssert.assertEquals(response.jsonPath().getString("message"),
-                String.valueOf(petId), "Message mismatch");
+                String.valueOf(pet.getId()), "Message mismatch");
     }
 
     @Then("the pet should no longer exist in the store")
     public void the_pet_should_no_longer_exist_in_the_store() {
-        logger.info("Verifying deletion of pet with ID: {}", petId);
-        response = RestAssured.get(apiUrl + "/" + petId);
+        logger.info("Verifying deletion of pet with ID: {}", pet.getId());
+        response = petUtils.getPetById(pet.getId());
         softAssert.assertEquals(response.getStatusCode(), 404, "Expected status code 404");
         softAssert.assertEquals(response.jsonPath().getString("message"),
                 "Pet not found", "Message mismatch");
