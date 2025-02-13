@@ -11,8 +11,9 @@ The project tests the Petstore API endpoints, with scenarios derived from [Swagg
 ### Project Structure
 
 - **`pom.xml`**: Maven configuration file for managing project dependencies.
-- **`src/main/java/com/model`**: Contains model classes like `Category`, `Pet`, and `Tag`.
+- **`src/main/java/com/dto`**: Contains model classes like `Category`, `Pet`, and `Tag`.
 - **`src/test/java/com/petstore`**: Holds test-related classes.
+    - **`requestspecification/RequestSpec.java`**: building requests
     - **`runner/CucumberRunner.java`**: Entry point for running Cucumber tests.
     - **`stepdefinitions/PetSteps.java`**: Step definitions for Petstore API tests.
     - **`utilities`**: Utility classes for configurations and pet-related operations.
